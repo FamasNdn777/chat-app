@@ -1,1 +1,40 @@
-agrgrgrg
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Simples</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    #chat { height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Chat</h2>
+  <div id="chat"></div>
+  <input id="user" placeholder="Seu nome" /><br><br>
+  <input id="msg" placeholder="Digite sua mensagem" />
+  <button onclick="enviar()">Enviar</button>
+
+  <script>
+    async function carregarMensagens() {
+      const res = await fetch('/api/chat');
+      const mensagens = await res.json();
+      document.getElementById('chat').innerHTML = mensagens.map(m => `<div><b>${m.user}:</b> ${m.message}</div>`).join('');
+    }
+
+    async function enviar() {
+      const user = document.getElementById('user').value;
+      const msg = document.getElementById('msg').value;
+      await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user, message: msg })
+      });
+      document.getElementById('msg').value = '';
+      carregarMensagens();
+    }
+
+    setInterval(carregarMensagens, 2000);
+    carregarMensagens();
+  </script>
+</body>
+</html>
